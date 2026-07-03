@@ -21,23 +21,31 @@ def home():
 
 @app.route("/predict", methods=["POST"])
 def predict():
+    
+    try:
+        selected = request.form.getlist("symptoms")
 
-    selected = request.form.getlist("symptoms")
+        input_data = [0] * len(symptoms)
 
-    input_data = [0] * len(symptoms)
+        for symptom in selected:
+            if symptom in symptoms:
+                input_data[symptoms.index(symptom)] = 1
 
-    for symptom in selected:
-        if symptom in symptoms:
-            input_data[symptoms.index(symptom)] = 1
+        prediction = model.predict([input_data])[0]
 
-    prediction = model.predict([input_data])[0]
+        return render_template(
+            "index.html",
+            symptoms=symptoms,
+            prediction=prediction
+        )
 
-    return render_template(
-        "index.html",
-        symptoms=symptoms,
-        prediction=prediction
-    )
+    except Exception as e:
+        print(f"Failed to run prediction: {e}")
 
-
+        return render_template(
+            "index.html",
+            symptoms=symptoms,
+            prediction="Prediction failed"
+        )
 if __name__ == "__main__":
     app.run(debug=True)    
