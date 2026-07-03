@@ -2,7 +2,10 @@ import pandas as pd
 import joblib
 
 # Load trained model
-model = joblib.load("models/disease_model.pkl")
+try:
+    model = joblib.load("models/disease_model.pkl")
+except FileNotFoundError:
+    print("Model file missing")
 
 # Load dataset to get symptom names
 df = pd.read_csv("data/Training.csv")
@@ -21,6 +24,9 @@ print("Example: 1,5,10")
 choices = input("Your symptoms: ")
 
 selected = [int(x)-1 for x in choices.split(",")]
+
+if not selected:
+    return render_template("index.html",symptoms=symptoms,predictions="Please select symptoms")
 
 input_data = [0]*len(symptoms)
 
